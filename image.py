@@ -6,7 +6,7 @@ def get_img_as_base64(file):
     with open(file,"rb") as f:
         data = f.read()
     return base64.b64encode(data).decode()
-img = get_img_as_base64("C:\\Users\\manju\\OneDrive\\Desktop\\GUVI\\Text to Image\\image.png")
+img = get_img_as_base64("https://wallpapercave.com/wp/wp6774809.jpg")
 
 page_bg_img = f"""
 
