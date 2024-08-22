@@ -2,24 +2,23 @@ import requests
 import streamlit as st
 import base64
 
-def get_img_as_base64(file):
-    with open(file,"rb") as f:
-        data = f.read()
-    return base64.b64encode(data).decode()
-img = get_img_as_base64("https://wallpapercave.com/wp/wp6774809.jpg")
+def get_img_as_base64(url):
+    response = requests.get(url)
+    return base64.b64encode(response.content).decode()
+
+img_url = "https://wallpapercave.com/wp/wp6774809.jpg"
+img = get_img_as_base64(img_url)
 
 page_bg_img = f"""
-
 <style>
 [data-testid="stAppViewContainer"] > .main {{
-background-image :url("data:image/png;base64,{img}");
-background-size : cover;
+background-image: url("data:image/png;base64,{img}");
+background-size: cover;
 }}
 [data-testid="stHeader"]{{
-background:rgba(0,0,0,0);
+background: rgba(0,0,0,0);
 }}
 </style>
-
 """
 st.markdown(page_bg_img, unsafe_allow_html=True)
 
@@ -38,20 +37,23 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-
 API_URL = "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-dev"
 headers = {"Authorization": "Bearer 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"}
 
 def query(payload):
-	response = requests.post(API_URL, headers=headers, json=payload)
-	return response.content
-image_bytes = query({
-	"inputs": st.text_input('Enter Prompt'),
-})
-# You can access the image with PIL.Image for example
-import io
-from PIL import Image
-image = Image.open(io.BytesIO(image_bytes))
+    response = requests.post(API_URL, headers=headers, json=payload)
+    return response.content
 
-if st.button('Generate'):
-	st.image(image)
+# Take user input
+prompt = st.text_input('Enter Prompt')
+
+if prompt:
+    image_bytes = query({"inputs": prompt})
+
+    # You can access the image with PIL.Image for example
+    import io
+    from PIL import Image
+    image = Image.open(io.BytesIO(image_bytes))
+
+    if st.button('Generate'):
+        st.image(image, caption="Generated Image")
